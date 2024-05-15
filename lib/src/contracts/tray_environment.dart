@@ -79,13 +79,28 @@ class TrayEnvironment {
   TrayRequestError parseErrorDetails(
     TrayRequest request,
     Response response,
-    Map<String, dynamic> errorBodyJson, {
+    dynamic errorBody, {
     Map<String, dynamic>? debugInfo,
   }) {
+    final String? message;
+    final List<String>? errors;
+
+    if (errorBody is Map<String, dynamic>) {
+      message = errorBody['message'];
+      errors = errorBody['errors'];
+    } else if (errorBody is String) {
+      message = errorBody;
+      errors = null;
+    } else {
+      message = null;
+      errors = null;
+    }
+
+    final defaultMessage = 'Failed to load request ${request.url}!';
+
     return TrayRequestError(
-      message:
-          errorBodyJson['message'] ?? 'Failed to load request ${request.url}!',
-      errors: errorBodyJson['errors'] ?? [],
+      message: message ?? defaultMessage,
+      errors: errors ?? [],
       statusCode: response.statusCode ?? 500,
       debugInfo: debugInfo,
     );
