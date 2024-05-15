@@ -128,22 +128,24 @@ Future<TrayRequestResponse<ModelType>> makeTrayRequest<ModelType>(
       throw JsonConversionException(e.toString(), st);
     }
   } on DioException catch (e) {
+    final response = e.response;
+
     // log error
     logRequest(
       message:
-          'FETCH TRAY EXCEPTION: Api returned the status error code ${e.response?.statusCode ?? 500}',
+          'FETCH TRAY EXCEPTION: Api returned the status error code ${response?.statusCode ?? 500}',
       logType: FetchTrayLogLevel.error,
       requestDebugLevel: requestDebugLevel,
       request: request,
-      response: e.response,
+      response: response,
     );
 
-    if (e.response != null) {
+    if (response != null) {
       return TrayRequestResponse(
         error: request.getEnvironment().parseErrorDetails(
               request,
-              e.response!,
-              e.response!.data,
+              response,
+              e.response?.data,
             ),
       );
     } else {
